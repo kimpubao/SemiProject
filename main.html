@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뉴스 기사 제목 제목</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #444;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex; /* 컨테이너 안의 아이템들을 정렬하기 위해 flexbox 사용 */
+            justify-content: space-between; /* 아이템 간의 공간을 최대한 활용하여 배치 */
+            align-items: flex-start; /* 아이템을 수직으로 정렬 */
+        }
+        .article {
+            background-color: #CED8F6;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            width: 48%; /* 기사 아이템의 너비를 조정하여 두 개의 아이템을 한 줄에 표시 */
+        }
+        .article h2 {
+            font-size: 1.5em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .article p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .search-form {
+            background-color: #F6CED8;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            width: 48%; /* 검색 폼의 너비를 조정하여 두 개의 아이템을 한 줄에 표시 */
+            display: flex; /* 내부 아이템을 정렬하기 위해 flexbox 사용 */
+            align-items: center; /* 아이템을 수직으로 정렬 */
+        }
+        .search-form input[type="text"] {
+            flex: 1; /* 입력 필드가 남은 공간을 모두 차지하도록 함 */
+            padding: 8px;
+            border: none;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        .search-form button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            background-color: #fff;
+            color: #007bff;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background-color: #ddd;
+        }
+        .summary-link {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <h1>뉴스 기사</h1>
+    <div class="container">
+        <!-- 뉴스 기사 목록 -->
+        {% for article in articles %}
+        <div class="article">
+            <h2>{{ article.title }}</h2>
+            <p>{{ article.content }}</p>
+            <p class="summary-link"><a href="{{ article.summary_link }}">요약 링크</a></p>
+        </div>
+        {% endfor %}
+
+        <!-- 검색 폼 -->
+        <form class="search-form" action="{% url 'search' %}" method="GET">
+            <input type="text" name="q" placeholder="단어 검색">
+            <button type="submit">검색</button>
+        </form>
+    </div>
+</body>
+</html>
