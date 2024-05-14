@@ -6,6 +6,7 @@ class News(models.Model):
     content = models.TextField()
     create_date = models.DateTimeField()
     link = models.TextField()
+    summary = models.URLField() #추가
 
     def __str__(self):
         return self.subject
