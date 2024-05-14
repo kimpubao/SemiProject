@@ -1,9 +1,137 @@
-{% if news_list %}
-    <ul>
-    {% for news in news_list %}
-        <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>뉴스가 없습니다.</p>
-{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색 결과</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #444;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .search-form {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .search-form input[type="text"] {
+            padding: 8px;
+            border: none;
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        .search-form button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 3px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        .search-form button:hover {
+            background-color: #0056b3;
+        }
+        .search-results {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .search-results h2 {
+            font-size: 1.5em;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .search-results p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .search-results a {
+            color: #28a745;
+            text-decoration: none;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 3px;
+            border: 1px solid #007bff;
+        }
+        .pagination .current {
+            color: #fff;
+            background-color: #007bff;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>검색 결과</h1>
+    <div class="container">
+        <!-- 검색 폼 -->
+        <form class="search-form" action="#" method="GET">
+            <input type="text" name="q" placeholder="검색어 입력">
+            <button type="submit">검색</button>
+        </form>
+
+        <!-- 검색 결과 -->
+        <div class="search-results">
+            <ul>
+                {% if news_list %}
+            <ul>
+                {% for news in news_list %}
+                    <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
+                {% endfor %}
+                </ul>
+                {% else %}
+                    <p>뉴스가 없습니다.</p>
+                {% endif %}
+            <!-- 페이지 넘버링 -->
+            <div class="pagination" id="pagination">
+                <!-- JavaScript에서 동적으로 생성됩니다. -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 페이지 넘버링을 자동으로 생성하는 함수
+        function generatePagination(currentPage, totalPages) {
+            var pagination = document.getElementById('pagination');
+            pagination.innerHTML = ''; // 이전에 생성된 페이지 링크를 모두 제거
+
+            for (var i = 1; i <= totalPages; i++) {
+                var pageLink = document.createElement('a');
+                pageLink.href = '#'; // 실제 페이지 링크는 여기에 설정해야 합니다.
+                pageLink.textContent = i;
+                if (i === currentPage) {
+                    pageLink.className = 'current';
+                }
+                pagination.appendChild(pageLink);
+            }
+        }
+
+        // 검색 결과가 있는 페이지의 예시 데이터
+        var currentPage = 1; // 현재 페이지
+        var totalPages = 5; // 전체 페이지 수
+        generatePagination(currentPage, totalPages); // 페이지 넘버링 생성
+    </script>
+</body>
+</html>
