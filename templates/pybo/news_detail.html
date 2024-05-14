@@ -82,10 +82,10 @@
         <div class="article">
             <h2>{{ news.subject }}</h2>
             <p>{{ news.content }}</p>
-            <p class="summary-link"><a href="{{ article.summary_link }}">요약 링크</a></p>
+            <p class="summary-link"><a href="{% url 'summary' content=news.content %}" target="_blank">요약 링크</a></p>
         </div>
         <!-- 검색 폼 -->
-        <form class="search-form" action="" method="GET">
+        <form class="search-form" action="{% url 'search' %}"  method="GET">
             <input type="text" name="kw" placeholder="단어 검색">
             <button type="submit">검색</button>
         </form>
