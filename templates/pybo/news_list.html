@@ -1,0 +1,9 @@
+{% if news_list %}
+    <ul>
+    {% for news in news_list %}
+        <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>뉴스가 없습니다.</p>
+{% endif %}
