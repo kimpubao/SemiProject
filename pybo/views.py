@@ -3,7 +3,16 @@ from .models import News
 from django.conf import settings
 import requests
 import xml.etree.ElementTree as ET # xml 형식을 처리하는 라이브러리
+from typing import List
+from konlpy.tag import Okt
+from textrankr import TextRank
 
+class OktTonkenizer:
+    okt: Okt = Okt()
+    def __call__(self, text: str) -> List[str]:
+        tokens: List[str] = self.okt.phrases(text)
+        return tokens
+    
 def index(request):
     news_list = News.objects.order_by('-create_date')
     context = {'news_list' : news_list}
@@ -17,17 +26,28 @@ def detail(request, news_id):
 def search(request):
     if request.method == 'GET' and 'kw' in request.GET:
         api_key = ''
-        xml_data = requests.get(f"https://krdict.korean.go.kr/api/search?key={api_key}&q={request.GET.get('kw')}&advanced=y&method=exact&translated=y&trans_lang=1")
+        xml_data = requests.get(f"https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=xml&q={request.GET.get('kw')}")
         root = ET.fromstring(xml_data.text)
         word = root.find('./item/word').text
         definitions = [sense.find('./definition').text for sense in root.findall('./item/sense')]
-        # print("단어:", word)
         means = []
         for definition in definitions:
             means.append(definition)
         return render(request, 'search_result.html', {'word': word, 'means': means})
     else:
         return render(request, 'search_result.html')
+
+
+def summary(request, content):
+    mytokenizer: OktTonkenizer = OktTonkenizer()
+    textrank: TextRank = TextRank(mytokenizer)
+    k: int = 3
+    summaries: List[str] = textrank.summarize(content, k, verbose=False)
+    # for summary in summaries:
+    #     print(summary)
+
+    return render(request, 'summary_news.html', {'content': summaries})
+
     
 #추가
 # def search(request):
