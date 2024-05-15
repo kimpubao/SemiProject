@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,20 +17,22 @@
             text-align: center;
         }
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 20px auto;
             padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
         }
+        .articles {
+            width: 65%;
+        }
         .article {
-            background-color: #CED8F6;
+            background-color: #01DFA5;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             padding: 20px;
-            width: 48%;
         }
         .article h2 {
             font-size: 1.5em;
@@ -43,51 +45,168 @@
             margin-bottom: 10px;
         }
         .search-form {
-            background-color: #F6CED8;
+            {#background-color: #F6CED8;#}
             padding: 10px 20px;
             border-radius: 5px;
             margin-bottom: 20px;
-            width: 48%;
             display: flex;
             align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
         }
         .search-form input[type="text"] {
-            flex: 1;
             padding: 8px;
             border: none;
             border-radius: 3px;
             margin-right: 10px;
+            flex: 1;
+            box-sizing: border-box;
         }
         .search-form button {
             padding: 8px 16px;
             border: none;
             border-radius: 3px;
-            background-color: #fff;
-            color: #007bff;
+            background-color: #007bff;
+            color: #fff;
             cursor: pointer;
+            box-sizing: border-box;
         }
         .search-form button:hover {
-            background-color: #ddd;
+            background-color: #0056b3;
         }
         .summary-link {
             color: #28a745;
+        }
+        .search-results {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 30%;
+            margin-top: 0;
+        }
+        .search-results h2 {
+            font-size: 1em;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        .search-results p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        .search-results a {
+            color: #28a745;
+            text-decoration: none;
+        }
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 3px;
+            border: 1px solid #007bff;
+        }
+        .pagination .current {
+            color: #fff;
+            background-color: #007bff;
+            padding: 5px 10px;
+            margin: 0 2px;
+            border-radius: 3px;
+        }
+        .summary-tab {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 300px;
+            background-color: #0B3B24;
+            color: white;
+            border-top-right-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .summary-tab h2 {
+            font-size: 1.2em;
+            margin: 0 0 10px 0;
+            text-align: center;
+        }
+        .summary-tab p {
+            margin: 0 0 10px 0;
+            line-height: 1.6;
+        }
+        .summary-tab a {
+            color: #fff;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <h1>뉴스 기사</h1>
     <div class="container">
-        {% for article in articles %}
-        <div class="article">
-            <h2><a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a></h2>
-            <p>{{ article.content }}</p>
-            <p class="summary-link"><a href="{% url 'article_summary' article.pk %}">요약 링크</a></p>
+        <div class="articles">
+            {% for article in articles %}
+            <div class="article">
+                <h2><a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a></h2>
+                <p>{{ article.content }}</p>
+                <p class="summary-link"><a href="{% url 'article_summary' article.pk %}">요약 링크</a></p>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-        <form class="search-form" action="{% url 'search' %}" method="GET">
-            <input type="text" name="q" placeholder="단어 검색">
-            <button type="submit">검색</button>
-        </form>
+        <div class="search-results">
+            <form class="search-form" action="{% url 'search' %}" method="GET">
+                <input type="text" name="q" placeholder="단어 검색">
+                <button type="submit">검색</button>
+            </form>
+            <ul>
+                <li><a href="#">사이트 1</a></li>
+                <li><a href="#">사이트 2</a></li>
+                <li><a href="#">사이트 3</a></li>
+                <li><a href="#">사이트 4</a></li>
+                <li><a href="#">사이트 5</a></li>
+            </ul>
+            <!-- 페이지 넘버링 -->
+            <div class="pagination" id="pagination">
+                <!-- JavaScript에서 동적으로 생성됩니다. -->
+            </div>
+        </div>
     </div>
+    <div class="summary-tab">
+        <h2>요약</h2>
+        <div id="summaries">
+            {% for article in articles %}
+            <div class="article">
+                <h3><a href="{% url 'article_summary' article.pk %}">{{ article.title }}</a></h3>
+                <p>{{ article.summary }}</p>
+                <p class="summary-link"><a href="{% url 'article_summary' article.pk %}">전체 기사 보기</a></p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        // 페이지 넘버링을 자동으로 생성하는 함수
+        function generatePagination(currentPage, totalPages) {
+            var pagination = document.getElementById('pagination');
+            pagination.innerHTML = ''; // 이전에 생성된 페이지 링크를 모두 제거
+
+            for (var i = 1; i <= totalPages; i++) {
+                var pageLink = document.createElement('a');
+                pageLink.href = '#'; // 실제 페이지 링크는 여기에 설정해야 합니다.
+                pageLink.textContent = i;
+                if (i === currentPage) {
+                    pageLink.className = 'current';
+                }
+                pagination.appendChild(pageLink);
+            }
+        }
+
+        // 검색 결과가 있는 페이지의 예시 데이터
+        var currentPage = 1; // 현재 페이지
+        var totalPages = 5; // 전체 페이지 수
+        generatePagination(currentPage, totalPages); // 페이지 넘버링 생성
+    </script>
 </body>
 </html>
