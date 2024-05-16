@@ -52,7 +52,7 @@ def search_news(request):
         else: # 1월
             start_date_str = str(int(end_split[0])-1) + '-' + str(12) + '-' + end_split[2]
         # start_date_str = input("\n크롤링할 시작 날짜를 입력하세요 (YYYY-MM-DD 형식): ")
-        start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
+        start_date = datetime.datetime.strptime('2024-05-14', "%Y-%m-%d")
 
         # 크롤링할 종료 날짜 입력
         # end_date_str = input("\n크롤링할 종료 날짜를 입력하세요 (YYYY-MM-DD 형식): ")
@@ -128,7 +128,7 @@ def search_news(request):
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
 
-        cursor.execute('''CREATE TABLE IF NOT EXISTS news (
+        cursor.execute('''CREATE TABLE IF NOT EXISTS pybo_news (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             subject TEXT NOT NULL,
             content TEXT NOT NULL,
@@ -137,7 +137,7 @@ def search_news(request):
             summary TEXT
             )''')
         
-        cursor.executemany('insert into news (subject, content, create_date, link) values (?,?,?,?)', db_lst)
+        cursor.executemany('insert into pybo_news (subject, content, create_date, link) values (?,?,?,?)', db_lst)
         conn.commit()
         conn.close()
         news_list = News.objects.order_by('-create_date')
