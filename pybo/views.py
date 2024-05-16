@@ -24,11 +24,11 @@ def detail(request, news_id):
     context = {'news': news}
     return render(request, 'pybo/news_detail.html', context)
 
-def search(request):
+def search(request): # 사전 검색 api
     query = request.GET.get('kw')
     print('query:', query)
     if query:
-        api_key = ''
+        api_key = '3B1C2E44684222ED41D541AAA4226262'
         response = requests.get(f'https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=json&q={query}')
         if response.status_code == 200:
             data = response.json()
@@ -45,7 +45,7 @@ def search(request):
 
     return JsonResponse({'meaning': meaning})
 
-def summary(request, content, news_id):
+def summary(request, content, news_id): # 요약 함수
     news = News.objects.get(id=news_id)
     if news.summary:
         summaries = news.summary
