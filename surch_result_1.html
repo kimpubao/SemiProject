@@ -81,6 +81,18 @@
             margin: 0 2px;
             border-radius: 3px;
         }
+        .form-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .form-group label {
+            margin-right: 10px;
+        }
+
+        .form-group input[type="date"] {
+            width: 150px; /* 원하는 너비로 조절하세요 */
+        }
     </style>
 </head>
 <body>
@@ -92,6 +104,56 @@
             <button type="submit">검색</button>
         </form>
 
+        <!--- 날짜 --->
+        <form>
+    <div class="form-group">
+        <label for="startDate">시작 날짜:</label>
+        <input type="date" id="startDate" max="" min="1960-01-01">
+    </div>
+    <div class="form-group">
+        <label for="endDate">종료 날짜:</label>
+        <input type="date" id="endDate" max="" min="1960-01-01">
+    </div>
+    <div class="form-group">
+        <input type="submit" value="검색">
+    </div>
+</form>
+
+<script>
+    // 페이지 로드시 시작 날짜와 종료 날짜의 min 속성을 1960년 1월 1일로 설정
+    function setMinDate() {
+        document.getElementById('startDate').setAttribute('min', '1960-01-01');
+        document.getElementById('endDate').setAttribute('min', '1960-01-01');
+    }
+
+    // 페이지 로드시 시작 날짜와 종료 날짜의 max 속성을 현재 날짜로 설정
+    function setMaxDate() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var currentDate = yyyy + '-' + mm + '-' + dd;
+
+        document.getElementById('startDate').setAttribute('max', currentDate);
+        document.getElementById('endDate').setAttribute('max', currentDate);
+    }
+
+    window.onload = function() {
+        setMinDate();
+        setMaxDate();
+    };
+
+    // 시작 날짜와 종료 날짜가 변경될 때마다 사용자가 선택한 형식 그대로 저장
+    document.getElementById('startDate').addEventListener('change', function() {
+        var selectedDate = this.value;
+        document.getElementById('startDate').setAttribute('value', selectedDate);
+    });
+
+    document.getElementById('endDate').addEventListener('change', function() {
+        var selectedDate = this.value;
+        document.getElementById('endDate').setAttribute('value', selectedDate);
+    });
+</script>
         <!-- 검색 결과 -->
         <div class="search-results">
             <ul>
