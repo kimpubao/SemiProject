@@ -89,11 +89,10 @@
     <h1 style="padding-top: 20px;">검색 결과</h1>
     <div class="container">
         <!-- 검색 폼 -->
-        <form class="search-form" action="#" method="GET">
-            <input type="text" name="q" placeholder="검색어 입력">
+        <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}">
+            <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input">
             <button type="submit">검색</button>
         </form>
-
         <!-- 검색 결과 -->
         <div class="search-results">
             <ul>
@@ -112,6 +111,24 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // 폼 제출 방지
+            var query = document.getElementById('news-keyword-input').value;
+            var xhr = new XMLHttpRequest();
+            console.log(query);
+            xhr.open('GET', `search-news/?kw=` + encodeURIComponent(query), true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('검색 완료!');
+                } else {
+                    document.getElementById('search-results').innerText = '오류가 발생했습니다.';
+                }
+            };
+            xhr.send();
+        });
+    </script>
 
     <script>
         // 페이지 넘버링을 자동으로 생성하는 함수
