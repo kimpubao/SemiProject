@@ -24,20 +24,6 @@ def detail(request, news_id):
     context = {'news': news}
     return render(request, 'pybo/news_detail.html', context)
 
-# def search(request):
-#     if request.method == 'GET' and 'kw' in request.GET:
-#         api_key = ''
-#         xml_data = requests.get(f"https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=xml&q={request.GET.get('kw')}")
-#         root = ET.fromstring(xml_data.text)
-#         word = root.find('./item/word').text
-#         definitions = [sense.find('./definition').text for sense in root.findall('./item/sense')]
-#         means = []
-#         for definition in definitions:
-#             means.append(definition)
-#         return render(request, 'search_result.html', {'word': word, 'means': means})
-#     else:
-#         return render(request, 'search_result.html')
-
 def search(request):
     query = request.GET.get('kw')
     print('query:', query)
@@ -59,14 +45,22 @@ def search(request):
 
     return JsonResponse({'meaning': meaning})
 
-def summary(request, content):
-    mytokenizer: OktTonkenizer = OktTonkenizer()
-    textrank: TextRank = TextRank(mytokenizer)
-    k: int = 3
-    summaries: List[str] = textrank.summarize(content, k, verbose=False)
-    # for summary in summaries:
-    #     print(summary)
-
+def summary(request, content, news_id):
+    news = News.objects.get(id=news_id)
+    if news.summary:
+        summaries = news.summary
+        summaries = summaries.split(',')
+        summaries[0] = summaries[0][1:] # 괄호 제거
+        summaries[2] = summaries[2][:-1]
+    else:
+        mytokenizer: OktTonkenizer = OktTonkenizer()
+        textrank: TextRank = TextRank(mytokenizer)
+        k: int = 3
+        summaries: List[str] = textrank.summarize(content, k, verbose=False)
+        # for summary in summaries:
+        #     print(summary)
+        news.summary = summaries
+        news.save()
     return render(request, 'summary_news.html', {'content': summaries})
 
     
