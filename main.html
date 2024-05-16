@@ -28,11 +28,13 @@
             width: 65%;
         }
         .article {
-            background-color: #01DFA5;
+            background-color: #00BFFF;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             padding: 20px;
+            max-height: 400px;
+            overflow-y: auto; /* 세로 스크롤 추가 */
         }
         .article h2 {
             font-size: 1.5em;
@@ -45,7 +47,7 @@
             margin-bottom: 10px;
         }
         .search-form {
-            {#background-color: #F6CED8;#}
+            background-color: #F6CED8;
             padding: 10px 20px;
             border-radius: 5px;
             margin-bottom: 20px;
@@ -119,20 +121,19 @@
             border-radius: 3px;
         }
         .summary-tab {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 300px;
-            background-color: #0B3B24;
+            width: auto;
+            background-color: #0B3861;
             color: white;
-            border-top-right-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 5px; /* 모서리를 둥글게 설정 */
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 20px; /* 검색 결과와 겹치지 않도록 여백 설정 */
+            max-height: 400px; /* 높이 제한 */
+            overflow-y: auto; /* 세로 스크롤 추가 */
         }
         .summary-tab h2 {
             font-size: 1.2em;
             margin: 0 0 10px 0;
-            text-align: center;
         }
         .summary-tab p {
             margin: 0 0 10px 0;
@@ -142,6 +143,7 @@
             color: #fff;
             text-decoration: underline;
         }
+
     </style>
 </head>
 <body>
@@ -155,6 +157,19 @@
                 <p class="summary-link"><a href="{% url 'article_summary' article.pk %}">요약 링크</a></p>
             </div>
             {% endfor %}
+            <!-- 요약 탭을 민트색 탭 바로 아래로 이동 -->
+            <div class="summary-tab">
+                <h2>요약</h2>
+                <div id="summaries">
+                    {% for article in articles %}
+                    <div class="article">
+                        <h3><a href="{% url 'article_summary' article.pk %}">{{ article.title }}</a></h3>
+                        <p>{{ article.summary }}</p>
+                        <p class="summary-link"><a href="{% url 'article_summary' article.pk %}">전체 기사 보기</a></p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
         <div class="search-results">
             <form class="search-form" action="{% url 'search' %}" method="GET">
@@ -172,18 +187,6 @@
             <div class="pagination" id="pagination">
                 <!-- JavaScript에서 동적으로 생성됩니다. -->
             </div>
-        </div>
-    </div>
-    <div class="summary-tab">
-        <h2>요약</h2>
-        <div id="summaries">
-            {% for article in articles %}
-            <div class="article">
-                <h3><a href="{% url 'article_summary' article.pk %}">{{ article.title }}</a></h3>
-                <p>{{ article.summary }}</p>
-                <p class="summary-link"><a href="{% url 'article_summary' article.pk %}">전체 기사 보기</a></p>
-            </div>
-            {% endfor %}
         </div>
     </div>
     <script>
