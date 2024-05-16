@@ -1,3 +1,4 @@
+{#225번줄에 사이트 임의로 입력하였습니다.#}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -86,6 +87,8 @@
             padding: 20px;
             width: 30%;
             margin-top: 0;
+            height: 400px; /* 원하는 높이로 설정 */
+            overflow-y: auto;
         }
         .search-results h2 {
             font-size: 1em;
@@ -172,44 +175,65 @@
             </div>
         </div>
         <div class="search-results">
-            <form class="search-form" action="{% url 'search' %}" method="GET">
-                <input type="text" name="q" placeholder="단어 검색">
-                <button type="submit">검색</button>
-            </form>
-            <ul>
-                <li><a href="#">사이트 1</a></li>
-                <li><a href="#">사이트 2</a></li>
-                <li><a href="#">사이트 3</a></li>
-                <li><a href="#">사이트 4</a></li>
-                <li><a href="#">사이트 5</a></li>
-            </ul>
-            <!-- 페이지 넘버링 -->
-            <div class="pagination" id="pagination">
-                <!-- JavaScript에서 동적으로 생성됩니다. -->
-            </div>
-        </div>
+    <form class="search-form" action="#" onsubmit="search()">
+        <input type="text" id="searchInput" placeholder="단어 검색">
+        <button type="submit">검색</button>
+    </form>
+    <ul id="searchResults">
+        <!-- 검색 결과는 여기에 추가 -->
+    </ul>
+    <!-- 페이지 넘버링 -->
+    <div class="pagination" id="pagination">
+        <!-- JavaScript에서 동적으로 생성 -->
     </div>
+</div>
     <script>
-        // 페이지 넘버링을 자동으로 생성하는 함수
         function generatePagination(currentPage, totalPages) {
-            var pagination = document.getElementById('pagination');
-            pagination.innerHTML = ''; // 이전에 생성된 페이지 링크를 모두 제거
+    var pagination = document.getElementById('pagination');
+    pagination.innerHTML = ''; // 이전에 생성된 페이지 링크를 모두 제거
 
-            for (var i = 1; i <= totalPages; i++) {
-                var pageLink = document.createElement('a');
-                pageLink.href = '#'; // 실제 페이지 링크는 여기에 설정해야 합니다.
-                pageLink.textContent = i;
-                if (i === currentPage) {
-                    pageLink.className = 'current';
-                }
-                pagination.appendChild(pageLink);
-            }
+    for (var i = 1; i <= totalPages; i++) {
+        var pageLink = document.createElement('a');
+        pageLink.href = '#'; // 실제 페이지 링크는 여기에 설정해야 함
+        pageLink.textContent = i;
+        if (i === currentPage) {
+            pageLink.className = 'current';
         }
+        pagination.appendChild(pageLink);
+    }
+}
 
-        // 검색 결과가 있는 페이지의 예시 데이터
-        var currentPage = 1; // 현재 페이지
-        var totalPages = 5; // 전체 페이지 수
-        generatePagination(currentPage, totalPages); // 페이지 넘버링 생성
+// 검색 함수
+function search() {
+    var searchInput = document.getElementById('searchInput').value;
+    // 여기서 검색을 수행하고 결과를 받아옵니다.
+    var searchResults = ['검색 결과 1', '검색 결과 2', '검색 결과 3']; // 임시 데이터
+
+    // 검색 결과를 보여줄 곳과 페이지 넘버링을 업데이트합니다.
+    showSearchResults(searchResults);
+}
+
+// 검색 결과를 보여주고 페이지 넘버링을 업데이트하는 함수
+function showSearchResults(results) {
+    var searchResultsContainer = document.getElementById('searchResults');
+    searchResultsContainer.innerHTML = ''; // 이전 검색 결과를 모두 지움
+
+    // 검색 결과를 리스트로 표시합니다.
+    results.forEach(function(result) {
+        var listItem = document.createElement('li');
+        var link = document.createElement('a');
+        link.textContent = result;
+        link.href = '#naver.com'; // 실제 링크는 여기에 설정(임의로 설정)
+        listItem.appendChild(link);
+        searchResultsContainer.appendChild(listItem);
+    });
+
+    // 임의의 검색 결과 수를 totalPages로 설정
+    var totalPages = results.length;
+    var currentPage = 1; // 임의로 현재 페이지를 1로 설정
+    generatePagination(currentPage, totalPages);
+    }
     </script>
+    </div>
 </body>
 </html>
