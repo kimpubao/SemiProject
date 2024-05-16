@@ -1,3 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -84,7 +86,7 @@
     </style>
 </head>
 <body>
-    <h1>검색 결과</h1>
+    <h1 style="padding-top: 20px;">검색 결과</h1>
     <div class="container">
         <!-- 검색 폼 -->
         <form class="search-form" action="#" method="GET">
@@ -135,3 +137,5 @@
     </script>
 </body>
 </html>
+
+{% endblock %}
