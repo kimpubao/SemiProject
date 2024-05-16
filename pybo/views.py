@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from .models import News
 from django.conf import settings
@@ -23,20 +24,40 @@ def detail(request, news_id):
     context = {'news': news}
     return render(request, 'pybo/news_detail.html', context)
 
-def search(request):
-    if request.method == 'GET' and 'kw' in request.GET:
-        api_key = ''
-        xml_data = requests.get(f"https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=xml&q={request.GET.get('kw')}")
-        root = ET.fromstring(xml_data.text)
-        word = root.find('./item/word').text
-        definitions = [sense.find('./definition').text for sense in root.findall('./item/sense')]
-        means = []
-        for definition in definitions:
-            means.append(definition)
-        return render(request, 'search_result.html', {'word': word, 'means': means})
-    else:
-        return render(request, 'search_result.html')
+# def search(request):
+#     if request.method == 'GET' and 'kw' in request.GET:
+#         api_key = ''
+#         xml_data = requests.get(f"https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=xml&q={request.GET.get('kw')}")
+#         root = ET.fromstring(xml_data.text)
+#         word = root.find('./item/word').text
+#         definitions = [sense.find('./definition').text for sense in root.findall('./item/sense')]
+#         means = []
+#         for definition in definitions:
+#             means.append(definition)
+#         return render(request, 'search_result.html', {'word': word, 'means': means})
+#     else:
+#         return render(request, 'search_result.html')
 
+def search(request):
+    query = request.GET.get('kw')
+    print('query:', query)
+    if query:
+        api_key = ''
+        response = requests.get(f'https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=json&q={query}')
+        if response.status_code == 200:
+            data = response.json()
+            means_lst = []
+            for i in data['channel']['item']:
+                means_lst.append(i['sense']['definition'])
+            # print(data['channel']['item'][0]['sense']['definition']) # 실제로 쓰일 데이터
+            print(means_lst)
+            meaning = means_lst
+        else:
+            meaning = '뜻을 찾을 수 없습니다.'
+    else:
+        meaning = '검색어를 입력하세요.'
+
+    return JsonResponse({'meaning': meaning})
 
 def summary(request, content):
     mytokenizer: OktTonkenizer = OktTonkenizer()

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>뉴스 기사 제목 제목</title>
+    <title>뉴스 기사 제목</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,12 +43,15 @@
             line-height: 1.6;
             margin-bottom: 10px;
         }
+        .dict-content{
+            width: 30%;
+        }
         .search-form {
             background-color: #F6CED8;
             padding: 10px 20px;
             border-radius: 5px;
             margin-bottom: 20px;
-            width: 30%; /* 검색 폼의 너비를 조정하여 두 개의 아이템을 한 줄에 표시 */
+             /* 검색 폼의 너비를 조정하여 두 개의 아이템을 한 줄에 표시 */
             display: flex; /* 내부 아이템을 정렬하기 위해 flexbox 사용 */
             align-items: center; /* 아이템을 수직으로 정렬 */
         }
@@ -73,6 +76,15 @@
         .summary-link {
             color: #28a745;
         }
+
+        .search-content {
+            margin-top: 20px;
+            background-color: #FFF2CC;
+            padding: 20px;
+            border-radius: 5px;
+            
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -85,15 +97,42 @@
             <p class="summary-link"><a href="{% url 'summary' content=news.content %}" target="_blank">요약 링크</a></p>
         </div>
         <!-- 검색 폼 -->
-        <form class="search-form" action="{% url 'search' %}"  method="GET">
-            <input type="text" name="kw" placeholder="단어 검색">
-            <button type="submit">검색</button>
-        </form>
-        <!-- 검색 내용 -->
+        <div class="dict-content">
+            <form class="search-form" id="search-form">
+                <input type="text" name="kw" placeholder="단어 검색" id="search-input">
+                <button type="submit">검색</button>
+            </form>
+            <!-- 검색 내용 -->
+            <div class="search-content" id="search-content">
+                <p class="means" id="search-result"></p>
+            </div>
+        </div>
     </div>
-    <div class="search-content">
-        <p class="means">
-        </p>
-    </div>
+    
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // 폼 제출 방지
+            var query = document.getElementById('search-input').value;
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', `/search/?kw=` + encodeURIComponent(query), true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var data = JSON.parse(xhr.responseText);
+                    var meanings = data.meaning;
+                    var resultContainer = document.getElementById('search-result');
+                    resultContainer.innerHTML = ''; // 검색기록 누적 방지
+                    meanings.forEach(function(meaning) {
+                        var p = document.createElement('p'); // p 태그 생성
+                        p.textContent = meaning;
+                        resultContainer.appendChild(p); // p 태그 추가
+                    });
+                } else {
+                    document.getElementById('search-result').innerText = '오류가 발생했습니다.';
+                }
+            };
+            xhr.send();
+        });
+    </script>
 </body>
 </html>
