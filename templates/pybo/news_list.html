@@ -126,23 +126,16 @@
             let query = document.getElementById('news-keyword-input').value;
             let startDate = document.getElementById('startDate').value;
             let endDate = document.getElementById('endDate').value;
-            if(query.trim() === ''){
-                alert('키워드를 입력해주세요!');
-                return;
-            }
-            else{
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', `search-news/?kw=` + encodeURIComponent(query) + `&startDate=` + encodeURIComponent(startDate) + `&endDate=` + encodeURIComponent(endDate), true);
-                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        alert('검색 완료!');
-                    } else {
-                        document.getElementById('search-results').innerText = '오류가 발생했습니다.';
-                    }
-                };
-                xhr.send();
-            }
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', `search-news/?kw=` + encodeURIComponent(query) + `&startDate=` + encodeURIComponent(startDate) + `&endDate=` + encodeURIComponent(endDate), true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    alert('검색 완료!');
+                } else {
+                    document.getElementById('search-results').innerText = '오류가 발생했습니다.';
+                }
+            };
         });
     </script>
 
@@ -154,7 +147,7 @@
 
             for (var i = 1; i <= totalPages; i++) {
                 var pageLink = document.createElement('a');
-                pageLink.href = '#'; // 실제 페이지 링크는 여기에 설정해야 합니다.
+                pageLink.href = '#'; 
                 pageLink.textContent = i;
                 if (i === currentPage) {
                     pageLink.className = 'current';

@@ -5,6 +5,7 @@ class News(models.Model):
     subject = models.CharField(max_length=200)
     content = models.TextField()
     create_date = models.DateTimeField()
+    # news_date = models.DateTimeField()
     link = models.TextField()
     summary = models.TextField(null=True, blank=True)
 

@@ -169,17 +169,21 @@
 
         document.getElementById('summary-link').addEventListener('click', function(event) {
             event.preventDefault();
-            var url = `{% url 'summary' content=news.content news_id=news.id %}`;
+            var url = `{% url 'summary' news_id=news.id %}`;
             var newWindow = window.open('', '_blank', 'width=600,height=400');
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onload = function() {
                 if (xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
+                    var data = xhr.responseText.split('\n');
+                    console.log(data);
                     newWindow.document.write('<html><head><title>뉴스 요약</title><style>body{font-family:Roboto,sans-serif;padding:20px;}h1{color:#444;}p{color:#666;line-height:1.8;}</style></head><body>');
                     newWindow.document.write('<h1>뉴스 요약</h1>');
-                    newWindow.document.write('<p>' + data.summary + '</p>');
+                    data.forEach(function(responseText) {
+                        newWindow.document.write(responseText);
+                    });
+                    // newWindow.document.write('<p>' + data.summary + '</p>');
                     newWindow.document.write('</body></html>');
                 } else {
                     newWindow.document.write('요약을 가져오는데 오류가 발생했습니다.');

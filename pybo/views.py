@@ -10,6 +10,7 @@ from typing import List
 from konlpy.tag import Okt
 from textrankr import TextRank
 import datetime
+from django.db.models import Q
 
 class OktTonkenizer:
     okt: Okt = Okt()
@@ -43,6 +44,7 @@ def articles_crawler(url):
 def search_news(request):
     if 'kw' in request.GET:
         search = request.GET['kw']
+        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') # 현재 시각
         
         # 크롤링할 시작 날짜 입력
         start_date_str = str(request.GET.get('sDate'))
@@ -78,7 +80,6 @@ def search_news(request):
         db_lst = [] # DB에 담을 데이터 리스트. 2차원으로 될 것.
         # 뉴스 내용 크롤링
         for i in final_urls:
-            lst = [] # DB에 넣기 전에 1차원 리스트로 묶어야됨
             # 각 기사 html get
             news = requests.get(i, headers=headers)
             news_html = BeautifulSoup(news.text, "html.parser")
@@ -104,9 +105,6 @@ def search_news(request):
             pattern2 = """[\n\n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}"""
             content = content.replace(pattern2, '')
 
-            lst.append(title)
-            lst.append(content)
-
             try:
                 html_date = news_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
                 news_date = html_date.attrs['data-date-time']
@@ -114,9 +112,7 @@ def search_news(request):
                 news_date = news_html.select_one("#content > div.end_ct > div > div.article_info > span > em")
                 news_date = re.sub(pattern=pattern1, repl='', string=str(news_date))
             # 날짜 가져오기
-            lst.append(news_date)
-            lst.append(i)
-            db_lst.append(lst) # DB 리스트에 저장
+            db_lst.append([title, content, now_time, i]) # DB 리스트에 저장
 
         # DB 연동
         conn = sqlite3.connect('db.sqlite3')
@@ -126,7 +122,6 @@ def search_news(request):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             subject TEXT NOT NULL,
             content TEXT NOT NULL,
-            create_date TEXT NOT NULL,
             link TEXT NOT NULL,
             summary TEXT
             )''')
@@ -134,9 +129,12 @@ def search_news(request):
         cursor.executemany('insert into pybo_news (subject, content, create_date, link) values (?,?,?,?)', db_lst)
         conn.commit()
         conn.close()
-        news_list = News.objects.order_by('-create_date')
-        context = {'news_list' : news_list}
-        return render(request, 'pybo/news_list.html',context)
+        # news_list = News.objects.order_by('-create_date')
+        search_results = News.objects.filter(
+            (Q(subject__icontains=search) | Q(content__icontains=search)) & Q(create_date__gte=now_time)
+        ).order_by('-create_date')
+        context = {'news_list' : search_results}
+        return render(request, 'pybo/news_list.html', context)
 
 def index(request):
     news_list = News.objects.order_by('-create_date')
@@ -167,7 +165,7 @@ def search_dict(request): # 사전 검색 api
 
     return JsonResponse({'meaning': meaning})
 
-def summary(request, content, news_id): # 요약 함수
+def summary(request, news_id): # 요약 함수
     news = News.objects.get(id=news_id)
     if news.summary:
         summaries = news.summary
@@ -178,7 +176,7 @@ def summary(request, content, news_id): # 요약 함수
         mytokenizer: OktTonkenizer = OktTonkenizer()
         textrank: TextRank = TextRank(mytokenizer)
         k: int = 3
-        summaries: List[str] = textrank.summarize(content, k, verbose=False)
+        summaries: List[str] = textrank.summarize(news.content, k, verbose=False)
         # for summary in summaries:
         #     print(summary)
         news.summary = summaries
