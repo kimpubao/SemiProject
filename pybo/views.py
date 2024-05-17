@@ -11,6 +11,7 @@ from konlpy.tag import Okt
 from textrankr import TextRank
 import datetime
 from django.db.models import Q
+from django.utils import timezone
 
 class OktTonkenizer:
     okt: Okt = Okt()
@@ -44,8 +45,9 @@ def articles_crawler(url):
 def search_news(request):
     if 'kw' in request.GET:
         search = request.GET['kw']
-        now_time = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') # 현재 시각
-        
+        # now_time = datetime.datetime.now().strftime('%Y-%m-%d %H-%M-%S') # 현재 시각
+        now_time = timezone.now()
+
         # 크롤링할 시작 날짜 입력
         start_date_str = str(request.GET.get('sDate'))
         end_date_str = str(request.GET.get('eDate'))
@@ -78,63 +80,81 @@ def search_news(request):
                 final_urls.append(news_url_1[i])
 
         db_lst = [] # DB에 담을 데이터 리스트. 2차원으로 될 것.
-        # 뉴스 내용 크롤링
-        for i in final_urls:
-            # 각 기사 html get
-            news = requests.get(i, headers=headers)
-            news_html = BeautifulSoup(news.text, "html.parser")
-
-            # 뉴스 제목
-            title = news_html.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
-            if title == None:
-                title = news_html.select_one("#content > div.end_ct > div > h2")
-
-            # 뉴스 본문
-            content = news_html.select("article#dic_area")
-            if content == []:
-                content = news_html.select("#articeBody")
-
-            # 기사 텍스트만 가져오기
-            # list합치기
-            content = ''.join(str(content))
-
-            # html태그제거 및 텍스트 다듬기
-            pattern1 = '<[^>]*>'
-            title = re.sub(pattern=pattern1, repl='', string=str(title))
-            content = re.sub(pattern=pattern1, repl='', string=content)
-            pattern2 = """[\n\n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}"""
-            content = content.replace(pattern2, '')
-
-            try:
-                html_date = news_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
-                news_date = html_date.attrs['data-date-time']
-            except AttributeError:
-                news_date = news_html.select_one("#content > div.end_ct > div > div.article_info > span > em")
-                news_date = re.sub(pattern=pattern1, repl='', string=str(news_date))
-            # 날짜 가져오기
-            db_lst.append([title, content, now_time, news_date, i]) # DB 리스트에 저장
-
-        # DB 연동
+        
+        # DB에 있는 링크와 겹치면 가져온 데이터의 작업 취소
         conn = sqlite3.connect('db.sqlite3')
         cursor = conn.cursor()
+        saved_url = []
+        for link in final_urls:
+            cursor.execute("SELECT * FROM pybo_news WHERE link = ?", (link,)) # 링크 데이터 조회
+            result = cursor.fetchall()
+            if result:
+                saved_url.append(link)
+        for link in saved_url:
+            final_urls.remove(link) # 현재 저장되어 있는 데이터 삭제
+        # 뉴스 내용 크롤링
+        if final_urls:
+            for i in final_urls:
+                # 각 기사 html get
+                news = requests.get(i, headers=headers)
+                news_html = BeautifulSoup(news.text, "html.parser")
 
-        cursor.execute('''CREATE TABLE IF NOT EXISTS pybo_news (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            subject TEXT NOT NULL,
-            content TEXT NOT NULL,
-            create_date DATETIME NOT NULL,
-            news_date DATETIME,
-            link TEXT NOT NULL,
-            summary TEXT
-            )''')
-        
-        cursor.executemany('insert into pybo_news (subject, content, create_date, news_date, link) values (?,?,?,?,?)', db_lst)
-        conn.commit()
-        conn.close()
-        news_list = News.objects.order_by('-create_date')
-        context = {'news_list' : news_list}
-        # search_results = News.objects.filter(Q(create_date__gte=now_time)).order_by('-create_date')
-        # context = {'news_list' : search_results}
+                # 뉴스 제목
+                title = news_html.select_one("#ct > div.media_end_head.go_trans > div.media_end_head_title > h2")
+                if title == None:
+                    title = news_html.select_one("#content > div.end_ct > div > h2")
+
+                # 뉴스 본문
+                content = news_html.select("article#dic_area")
+                if content == []:
+                    content = news_html.select("#articeBody")
+
+                # list합치기
+                content = ''.join(str(content))
+
+                # html태그제거 및 텍스트 다듬기
+                pattern1 = '<[^>]*>'
+                title = re.sub(pattern=pattern1, repl='', string=str(title))
+                content = re.sub(pattern=pattern1, repl='', string=content)
+                pattern2 = """[\n\n\n\n\n// flash 오류를 우회하기 위한 함수 추가\nfunction _flash_removeCallback() {}"""
+                content = content.replace(pattern2, '')
+
+                try:
+                    html_date = news_html.select_one("div#ct> div.media_end_head.go_trans > div.media_end_head_info.nv_notrans > div.media_end_head_info_datestamp > div > span")
+                    news_date = html_date.attrs['data-date-time']
+                except AttributeError:
+                    news_date = news_html.select_one("#content > div.end_ct > div > div.article_info > span > em")
+                    news_date = re.sub(pattern=pattern1, repl='', string=str(news_date))
+                # 날짜 가져오기
+                db_lst.append([title, content, now_time, news_date, i]) # DB 리스트에 저장
+
+            # DB 연동
+            conn = sqlite3.connect('db.sqlite3')
+            cursor = conn.cursor()
+
+            cursor.execute('''CREATE TABLE IF NOT EXISTS pybo_news (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                subject TEXT NOT NULL,
+                content TEXT NOT NULL,
+                create_date DATETIME NOT NULL,
+                news_date DATETIME,
+                link TEXT NOT NULL,
+                summary TEXT
+                )''')
+            
+            cursor.executemany('insert into pybo_news (subject, content, create_date, news_date, link) values (?,?,?,?,?)', db_lst)
+            conn.commit()
+            conn.close()
+
+        saved_url += final_urls # DB에 저장된 링크 통합
+        if len(saved_url) > 0:
+            link_conditions = Q(link=saved_url[0])
+            for link in saved_url[1:]:
+                link_conditions |= Q(link=link)
+            search_results = News.objects.filter(link_conditions).order_by('-create_date')
+            context = {'news_list' : search_results}
+        else:
+            context = {'news_list' : []}
         return render(request, 'pybo/news_list.html', context)
 
 def index(request):
@@ -151,9 +171,18 @@ def index(request):
         summary TEXT
         )''')
     conn.close()
+    saved_url = []
+    try:
+        link_conditions = Q(link=saved_url[0])
+        for link in saved_url[1:]:
+            link_conditions |= Q(link=link)
+        search_results = News.objects.filter(link_conditions).order_by('-create_date')
+        context = {'news_list' : search_results}
+    except:
+        context = {'news_list' : []}
     
-    news_list = News.objects.order_by('-create_date')
-    context = {'news_list' : news_list}
+    # news_list = News.objects.order_by('-create_date')
+    # context = {'news_list' : news_list}
     return render(request, 'pybo/news_list.html',context)
 
 def detail(request, news_id):
@@ -164,7 +193,7 @@ def detail(request, news_id):
 def search_dict(request): # 사전 검색 api
     query = request.GET.get('kw')
     if query:
-        api_key = '3B1C2E44684222ED41D541AAA4226262'
+        api_key = ''
         response = requests.get(f'https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=json&q={query}')
         if response.status_code == 200:
             data = response.json()
