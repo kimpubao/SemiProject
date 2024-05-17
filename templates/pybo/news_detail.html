@@ -79,7 +79,7 @@
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
-            background-color: #A9A9F5;
+            background-color: #9F81F7;
             color: #fff;
             cursor: pointer;
             font-size: 1em;
@@ -95,7 +95,7 @@
             transition: color 0.3s ease;
         }
         .summary-link a:hover {
-            color: #AC58FA;
+            color: #D358F7;
         }
         .search-content {
             background-color: #fff;
@@ -134,14 +134,18 @@
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     var data = JSON.parse(xhr.responseText);
-                    var meanings = data.meaning;
                     var resultContainer = document.getElementById('search-result');
                     resultContainer.innerHTML = ''; // 검색기록 누적 방지
-                    meanings.forEach(function(meaning) {
-                        var p = document.createElement('p'); // p 태그 생성
-                        p.textContent = meaning;
-                        resultContainer.appendChild(p); // p 태그 추가
-                    });
+                    if (data.meaning.length > 0) {
+                        var meanings = data.meaning;
+                        meanings.forEach(function(meaning) {
+                            var p = document.createElement('p');
+                            p.textContent = meaning;
+                            resultContainer.appendChild(p);
+                        });
+                    } else {
+                        resultContainer.textContent = '검색 결과가 없습니다.';
+                    }
                 } else {
                     document.getElementById('search-result').innerText = '오류가 발생했습니다.';
                 }
@@ -150,14 +154,14 @@
         }
 
         document.getElementById('search-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // 폼 제출 방지
+            event.preventDefault();
             var query = document.getElementById('search-input').value;
             performSearch(query);
         });
 
         document.getElementById('search-input').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); // 엔터 키 누르면 폼 제출 방지
+                event.preventDefault();
                 var query = document.getElementById('search-input').value;
                 performSearch(query);
             }
@@ -167,20 +171,18 @@
             event.preventDefault();
             var url = `{% url 'summary' content=news.content news_id=news.id %}`;
             var newWindow = window.open('', '_blank', 'width=600,height=400');
-            newWindow.document.write('<html><head><title>뉴스 요약</title><style>body{font-family:Roboto,sans-serif;padding:20px;}h1{color:#444;}#summary-box{border: 1px solid #ccc; padding: 20px; border-radius: 10px; background-color: #f0f0f0; max-height: 300px; overflow-y: auto;} p{color:#666;line-height:1.8;}</style></head><body>');
-            newWindow.document.write('<h1>뉴스 요약</h1>');
-            newWindow.document.write('<div id="summary-box"><p>요약을 가져오는 중입니다...</p></div>');
-            newWindow.document.write('</body></html>');
-
             var xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     var data = JSON.parse(xhr.responseText);
-                    newWindow.document.getElementById('summary-box').innerHTML = '<p>' + data.summary + '</p>';
+                    newWindow.document.write('<html><head><title>뉴스 요약</title><style>body{font-family:Roboto,sans-serif;padding:20px;}h1{color:#444;}p{color:#666;line-height:1.8;}</style></head><body>');
+                    newWindow.document.write('<h1>뉴스 요약</h1>');
+                    newWindow.document.write('<p>' + data.summary + '</p>');
+                    newWindow.document.write('</body></html>');
                 } else {
-                    newWindow.document.getElementById('summary-box').innerHTML = '<p>요약을 가져오는데 오류가 발생했습니다.</p>';
+                    newWindow.document.write('요약을 가져오는데 오류가 발생했습니다.');
                 }
             };
             xhr.send();
@@ -190,3 +192,4 @@
 </html>
 
 {% endblock %}
+
