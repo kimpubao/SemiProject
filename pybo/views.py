@@ -112,7 +112,7 @@ def search_news(request):
                 news_date = news_html.select_one("#content > div.end_ct > div > div.article_info > span > em")
                 news_date = re.sub(pattern=pattern1, repl='', string=str(news_date))
             # 날짜 가져오기
-            db_lst.append([title, content, now_time, i]) # DB 리스트에 저장
+            db_lst.append([title, content, now_time, news_date, i]) # DB 리스트에 저장
 
         # DB 연동
         conn = sqlite3.connect('db.sqlite3')
@@ -122,21 +122,36 @@ def search_news(request):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             subject TEXT NOT NULL,
             content TEXT NOT NULL,
+            create_date DATETIME NOT NULL,
+            news_date DATETIME,
             link TEXT NOT NULL,
             summary TEXT
             )''')
         
-        cursor.executemany('insert into pybo_news (subject, content, create_date, link) values (?,?,?,?)', db_lst)
+        cursor.executemany('insert into pybo_news (subject, content, create_date, news_date, link) values (?,?,?,?,?)', db_lst)
         conn.commit()
         conn.close()
-        # news_list = News.objects.order_by('-create_date')
-        search_results = News.objects.filter(
-            (Q(subject__icontains=search) | Q(content__icontains=search)) & Q(create_date__gte=now_time)
-        ).order_by('-create_date')
-        context = {'news_list' : search_results}
+        news_list = News.objects.order_by('-create_date')
+        context = {'news_list' : news_list}
+        # search_results = News.objects.filter(Q(create_date__gte=now_time)).order_by('-create_date')
+        # context = {'news_list' : search_results}
         return render(request, 'pybo/news_list.html', context)
 
 def index(request):
+    conn = sqlite3.connect('db.sqlite3')
+    cursor = conn.cursor()
+
+    cursor.execute('''CREATE TABLE IF NOT EXISTS pybo_news (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        subject TEXT NOT NULL,
+        content TEXT NOT NULL,
+        create_date DATETIME NOT NULL,
+        news_date DATETIME,
+        link TEXT NOT NULL,
+        summary TEXT
+        )''')
+    conn.close()
+    
     news_list = News.objects.order_by('-create_date')
     context = {'news_list' : news_list}
     return render(request, 'pybo/news_list.html',context)
@@ -149,7 +164,7 @@ def detail(request, news_id):
 def search_dict(request): # 사전 검색 api
     query = request.GET.get('kw')
     if query:
-        api_key = ''
+        api_key = '3B1C2E44684222ED41D541AAA4226262'
         response = requests.get(f'https://stdict.korean.go.kr/api/search.do?certkey_no=6592&key={api_key}&type_search=search&req_type=json&q={query}')
         if response.status_code == 200:
             data = response.json()
