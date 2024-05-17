@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>검색 결과</title>
+    <title>검색 리스트</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,6 +84,19 @@
             margin: 0 2px;
             border-radius: 3px;
         }
+        .search-results ul {
+            padding: 0;
+            list-style-type: none;
+        }
+        .search-results li {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+        .search-results li:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -106,61 +119,91 @@
         <div class="search-results">
             <ul>
                 {% if news_list %}
-                <ul>
                     {% for news in news_list %}
-                    <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
+                        <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
                     {% endfor %}
-                </ul>
                 {% else %}
                     <p>뉴스가 없습니다.</p>
                 {% endif %}
             </ul>
-            <!-- 페이지 넘버링 -->
+            <!-- 페이지 네비게이션 -->
             <div class="pagination" id="pagination">
                 <!-- JavaScript에서 동적으로 생성됩니다. -->
             </div>
         </div>
     </div>
     <script>
-        document.getElementById('search-form').addEventListener('submit', function(event) {
-            event.preventDefault(); // 폼 제출 방지
-            let query = document.getElementById('news-keyword-input').value;
-            let startDate = document.getElementById('startDate').value;
-            let endDate = document.getElementById('endDate').value;
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', `search-news/?kw=` + encodeURIComponent(query) + `&startDate=` + encodeURIComponent(startDate) + `&endDate=` + encodeURIComponent(endDate), true);
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    alert('검색 완료!');
+        const itemsPerPage = 20; // 한 페이지당 보여질 게시물 수
+        const newsList = document.querySelector('.search-results ul'); // 검색 결과 목록
+        const pagination = document.getElementById('pagination'); // 페이지 네비게이션
+        const newsItems = document.querySelectorAll('.search-results ul li'); // 검색 결과 항목들
+        const totalItems = newsItems.length; // 총 게시물 수
+        let currentPage = 1; // 현재 페이지
+
+        // 페이지 수 계산
+        const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+        // 한 페이지에 보여질 항목 수만큼의 게시물을 보여주는 함수
+        const showPage = (pageNumber) => {
+            // 시작 인덱스와 끝 인덱스 계산
+            const startIndex = (pageNumber - 1) * itemsPerPage;
+            const endIndex = pageNumber * itemsPerPage;
+
+            // 모든 검색 결과 숨기기
+            newsItems.forEach((item, index) => {
+                if (index >= startIndex && index < endIndex) {
+                    item.style.display = 'block';
                 } else {
-                    document.getElementById('search-results').innerText = '오류가 발생했습니다.';
+                    item.style.display = 'none';
                 }
-            };
-        });
-    </script>
+            });
+        };
 
-    <script>
-        // 페이지 넘버링을 자동으로 생성하는 함수
-        function generatePagination(currentPage, totalPages) {
-            var pagination = document.getElementById('pagination');
-            pagination.innerHTML = ''; // 이전에 생성된 페이지 링크를 모두 제거
+        // 페이지 네비게이션 생성
+        const createPagination = () => {
+            pagination.innerHTML = '';
 
-            for (var i = 1; i <= totalPages; i++) {
-                var pageLink = document.createElement('a');
-                pageLink.href = '#'; 
+            // 이전 버튼 생성
+            const prevButton = document.createElement('a');
+            prevButton.href = '#';
+            prevButton.textContent = '이전';
+            prevButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    showPage(currentPage);
+                }
+            });
+            pagination.appendChild(prevButton);
+
+            // 페이지 넘버링 생성
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.href = '#';
                 pageLink.textContent = i;
-                if (i === currentPage) {
-                    pageLink.className = 'current';
-                }
+                pageLink.addEventListener('click', () => {
+                    currentPage = i;
+                    showPage(currentPage);
+                });
                 pagination.appendChild(pageLink);
             }
-        }
 
-        // 검색 결과가 있는 페이지의 예시 데이터
-        var currentPage = 1; // 현재 페이지
-        var totalPages = 5; // 전체 페이지 수
-        generatePagination(currentPage, totalPages); // 페이지 넘버링 생성
+            // 다음 버튼 생성
+            const nextButton = document.createElement('a');
+            nextButton.href = '#';
+            nextButton.textContent = '다음';
+            nextButton.addEventListener('click', () => {
+                if (currentPage < totalPages) {
+                    currentPage
+                    currentPage++;
+                    showPage(currentPage);
+                }
+            });
+            pagination.appendChild(nextButton);
+        };
+
+        // 페이지 로드 시 초기 페이지 보여주기
+        showPage(currentPage);
+        createPagination();
     </script>
 </body>
 </html>
