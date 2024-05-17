@@ -106,14 +106,15 @@
         <div class="search-results">
             <ul>
                 {% if news_list %}
-            <ul>
-                {% for news in news_list %}
+                <ul>
+                    {% for news in news_list %}
                     <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
-                {% endfor %}
+                    {% endfor %}
                 </ul>
                 {% else %}
                     <p>뉴스가 없습니다.</p>
                 {% endif %}
+            </ul>
             <!-- 페이지 넘버링 -->
             <div class="pagination" id="pagination">
                 <!-- JavaScript에서 동적으로 생성됩니다. -->

@@ -177,13 +177,11 @@
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     var data = xhr.responseText.split('\n');
-                    console.log(data);
                     newWindow.document.write('<html><head><title>뉴스 요약</title><style>body{font-family:Roboto,sans-serif;padding:20px;}h1{color:#444;}p{color:#666;line-height:1.8;}</style></head><body>');
                     newWindow.document.write('<h1>뉴스 요약</h1>');
                     data.forEach(function(responseText) {
                         newWindow.document.write(responseText);
                     });
-                    // newWindow.document.write('<p>' + data.summary + '</p>');
                     newWindow.document.write('</body></html>');
                 } else {
                     newWindow.document.write('요약을 가져오는데 오류가 발생했습니다.');
