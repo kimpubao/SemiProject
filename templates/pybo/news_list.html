@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>검색 리스트</title>
+    <title>뉴스 리스트</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -107,21 +107,24 @@
     </style>
 </head>
 <body>
-    <h1 style="padding-top: 20px;">검색 결과</h1>
+    <h1 style="padding-top: 20px;">뉴스 리스트</h1>
     <div class="container">
-        <!-- 검색 폼 -->
-        <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}">
-            <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input">
-            <div class="form-group">
-                <label for="startDate">시작 날짜:</label>
-                <input type="date" name='sDate' id="startDate" max="" min="1960-01-01">
-            </div>
-            <div class="form-group">
-                <label for="endDate">종료 날짜:</label>
-                <input type="date" name='eDate' id="endDate" max="" min="1960-01-01">
-            </div>
-            <button type="submit">검색</button>
-        </form>
+       <!-- 검색 폼 -->
+       <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}" style="margin-right: 20px;">
+        <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input" style="margin-right: 10px;">
+        <div class="form-group" style="margin-right: 10px;">
+            <label for="startDate">시작 날짜:</label>
+            <input type="date" name='sDate' id="startDate" min="1960-01-01">
+        </div>
+        <div class="form-group" style="margin-right: 10px;">
+            <label for="endDate">종료 날짜:</label>
+            <input type="date" name='eDate' id="endDate" min="1960-01-01">
+        </div>
+        <button type="submit">검색</button>
+    </form>
+    
+    
+
         <!-- 검색 결과 -->
         <div class="search-results">
             <ul>
@@ -178,48 +181,60 @@
                 if (currentPage > 1) {
                     currentPage--;
                     showPage(currentPage);
+                    updatePagination();
                 }
             });
             pagination.appendChild(prevButton);
 
             // 페이지 넘버링 생성
-for (let i = 1; i <= totalPages; i++) {
-    const pageLink = document.createElement('a');
-    pageLink.href = '#';
-    pageLink.textContent = i;
-    if (i === currentPage) {
-        pageLink.classList.add('current'); // 현재 페이지 번호에 해당하는 링크에 'current' 클래스 추가
-    }
-    pageLink.addEventListener('click', () => {
-        currentPage = i;
-        showPage(currentPage);
-        // 클래스 추가 후 현재 페이지 번호만 다시 파란색으로 표시하기 위해 다른 페이지 번호의 클래스 제거
-        document.querySelectorAll('.pagination a').forEach(link => {
-            link.classList.remove('current');
-        });
-        pageLink.classList.add('current');
-    });
-    pagination.appendChild(pageLink);
-}
+            for (let i = 1; i <= totalPages; i++) {
+                const pageLink = document.createElement('a');
+                pageLink.href = '#';
+                pageLink.textContent = i;
+                if (i === currentPage) {
+                     pageLink.classList.add('current'); // 현재 페이지 번호에 해당하는 링크에 'current' 클래스 추가
+                }
+                pageLink.addEventListener('click', () => {
+                    currentPage = i;
+                    showPage(currentPage);
+                    updatePagination();
 
+                    // 다른 페이지 번호의 클래스 제거
+                    document.querySelectorAll('.pagination a').forEach(link => {
+                        link.classList.remove('current');
+                    });
 
+                    // 현재 페이지 번호만 파란색으로 표시
+                    pageLink.classList.add('current');
+                });
+                pagination.appendChild(pageLink);
+            }
+            
             // 다음 버튼 생성
             const nextButton = document.createElement('a');
             nextButton.href = '#';
             nextButton.textContent = '다음';
             nextButton.addEventListener('click', () => {
                 if (currentPage < totalPages) {
-                    currentPage
                     currentPage++;
                     showPage(currentPage);
+                    updatePagination();
                 }
             });
             pagination.appendChild(nextButton);
         };
 
+
         // 페이지 로드 시 초기 페이지 보여주기
         showPage(currentPage);
         createPagination();
+
+        // 현재 날짜 가져오기
+        const currentDate = new Date().toISOString().split('T')[0];
+
+        // 시작 날짜와 종료 날짜에 현재 날짜를 설정
+        document.getElementById('startDate').setAttribute('max', currentDate);
+        document.getElementById('endDate').setAttribute('max', currentDate);
     </script>
 </body>
 </html>
