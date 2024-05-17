@@ -24,6 +24,7 @@
             padding: 0 20px;
         }
         .search-form {
+            display: flex;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -91,6 +92,14 @@
         <!-- 검색 폼 -->
         <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}">
             <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input">
+            <div class="form-group">
+                <label for="startDate">시작 날짜:</label>
+                <input type="date" name='sDate' id="startDate" max="" min="1960-01-01">
+            </div>
+            <div class="form-group">
+                <label for="endDate">종료 날짜:</label>
+                <input type="date" name='eDate' id="endDate" max="" min="1960-01-01">
+            </div>
             <button type="submit">검색</button>
         </form>
         <!-- 검색 결과 -->
@@ -114,19 +123,26 @@
     <script>
         document.getElementById('search-form').addEventListener('submit', function(event) {
             event.preventDefault(); // 폼 제출 방지
-            var query = document.getElementById('news-keyword-input').value;
-            var xhr = new XMLHttpRequest();
-            console.log(query);
-            xhr.open('GET', `search-news/?kw=` + encodeURIComponent(query), true);
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    alert('검색 완료!');
-                } else {
-                    document.getElementById('search-results').innerText = '오류가 발생했습니다.';
-                }
-            };
-            xhr.send();
+            let query = document.getElementById('news-keyword-input').value;
+            let startDate = document.getElementById('startDate').value;
+            let endDate = document.getElementById('endDate').value;
+            if(query.trim() === ''){
+                alert('키워드를 입력해주세요!');
+                return;
+            }
+            else{
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', `search-news/?kw=` + encodeURIComponent(query) + `&startDate=` + encodeURIComponent(startDate) + `&endDate=` + encodeURIComponent(endDate), true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); // ajax
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        alert('검색 완료!');
+                    } else {
+                        document.getElementById('search-results').innerText = '오류가 발생했습니다.';
+                    }
+                };
+                xhr.send();
+            }
         });
     </script>
 

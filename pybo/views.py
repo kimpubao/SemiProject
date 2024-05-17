@@ -43,19 +43,13 @@ def articles_crawler(url):
 def search_news(request):
     if 'kw' in request.GET:
         search = request.GET['kw']
+        
         # 크롤링할 시작 날짜 입력
-        end_date_str = datetime.datetime.now().strftime('%Y-%m-%d')
-        start_date_str = None
-        end_split = end_date_str.split('-')
-        if  end_split[1] != '01': # 1월이 아니면
-            start_date_str = end_split[0] + '-' + str(int(end_split[1])-1) + '-' + end_split[2]
-        else: # 1월
-            start_date_str = str(int(end_split[0])-1) + '-' + str(12) + '-' + end_split[2]
-        # start_date_str = input("\n크롤링할 시작 날짜를 입력하세요 (YYYY-MM-DD 형식): ")
-        start_date = datetime.datetime.strptime('2024-05-14', "%Y-%m-%d")
-
-        # 크롤링할 종료 날짜 입력
-        # end_date_str = input("\n크롤링할 종료 날짜를 입력하세요 (YYYY-MM-DD 형식): ")
+        start_date_str = str(request.GET.get('sDate'))
+        end_date_str = str(request.GET.get('eDate'))
+        if (search == '' or start_date_str == '' or end_date_str == ''):
+            return render(request, 'pybo/news_list.html')
+        start_date = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
         end_date = datetime.datetime.strptime(end_date_str, "%Y-%m-%d")
 
         # naver url 생성
