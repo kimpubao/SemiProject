@@ -110,21 +110,18 @@
     <h1 style="padding-top: 20px;">뉴스 리스트</h1>
     <div class="container">
        <!-- 검색 폼 -->
-       <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}" style="margin-right: 20px;">
-        <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input" style="margin-right: 10px;">
-        <div class="form-group" style="margin-right: 10px;">
-            <label for="startDate">시작 날짜:</label>
-            <input type="date" name='sDate' id="startDate" min="1960-01-01">
-        </div>
-        <div class="form-group" style="margin-right: 10px;">
-            <label for="endDate">종료 날짜:</label>
-            <input type="date" name='eDate' id="endDate" min="1960-01-01">
-        </div>
-        <button type="submit">검색</button>
-    </form>
-    
-    
-
+        <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}" style="margin-right: 20px;">
+            <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input" style="margin-right: 10px;">
+            <div class="form-group" style="margin-right: 10px;">
+                <label for="startDate">시작 날짜:</label>
+                <input type="date" name='sDate' id="startDate" min="1960-01-01">
+            </div>
+            <div class="form-group" style="margin-right: 10px;">
+                <label for="endDate">종료 날짜:</label>
+                <input type="date" name='eDate' id="endDate" min="1960-01-01">
+            </div>
+            <button type="submit" id="search-btn">검색</button>
+        </form>
         <!-- 검색 결과 -->
         <div class="search-results">
             <ul>
@@ -133,7 +130,7 @@
                         <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
                     {% endfor %}
                 {% else %}
-                    <p>뉴스가 없습니다.</p>
+                    <p id="no-news">뉴스가 없습니다.</p>
                 {% endif %}
             </ul>
             <!-- 페이지 네비게이션 -->
@@ -142,6 +139,14 @@
             </div>
         </div>
     </div>
+    <script>
+        document.getElementById('search-btn').addEventListener('click', function() {
+            var noNewsElement = document.getElementById('no-news');
+            if (noNewsElement) {
+                noNewsElement.textContent = '탐색중';
+            }
+        });
+    </script>
     <script>
         const itemsPerPage = 10; // 한 페이지당 보여질 게시물 수
         const newsList = document.querySelector('.search-results ul'); // 검색 결과 목록
