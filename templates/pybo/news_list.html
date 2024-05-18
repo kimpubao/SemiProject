@@ -19,7 +19,7 @@
             text-align: center;
         }
         .container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 20px auto;
             padding: 0 20px;
         }
@@ -127,7 +127,11 @@
             <ul>
                 {% if news_list %}
                     {% for news in news_list %}
-                        <li><a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></li>
+                        <li>
+                            <span>{{ forloop.counter }} <a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></span>
+                            <span style="float: right;">{{ news.news_date}}</span>
+                        </li>
+
                     {% endfor %}
                 {% else %}
                     <p id="no-news">뉴스가 없습니다.</p>
@@ -176,57 +180,31 @@
 
         // 페이지 네비게이션 생성
         const createPagination = () => {
-            pagination.innerHTML = '';
-
-            // 이전 버튼 생성
-            const prevButton = document.createElement('a');
-            prevButton.href = '#';
-            prevButton.textContent = '이전';
-            prevButton.addEventListener('click', () => {
-                if (currentPage > 1) {
-                    currentPage--;
-                    showPage(currentPage);
-                    updatePagination();
-                }
-            });
-            pagination.appendChild(prevButton);
 
             // 페이지 넘버링 생성
-            for (let i = 1; i <= totalPages; i++) {
-                const pageLink = document.createElement('a');
-                pageLink.href = '#';
-                pageLink.textContent = i;
-                if (i === currentPage) {
-                     pageLink.classList.add('current'); // 현재 페이지 번호에 해당하는 링크에 'current' 클래스 추가
-                }
-                pageLink.addEventListener('click', () => {
-                    currentPage = i;
-                    showPage(currentPage);
-                    updatePagination();
+            function updatePagination() {
+                pagination.innerHTML = ''; // 기존 페이지 링크 초기화
 
-                    // 다른 페이지 번호의 클래스 제거
-                    document.querySelectorAll('.pagination a').forEach(link => {
-                        link.classList.remove('current');
+                const startPage = Math.max(1, currentPage - 5);
+                const endPage = Math.min(totalPages, currentPage + 5);
+
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageLink = document.createElement('a');
+                    pageLink.href = '#';
+                    pageLink.textContent = i;
+                    if (i === currentPage) {
+                        pageLink.classList.add('current');
+                    }
+                    pageLink.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        currentPage = i;
+                        showPage(currentPage);
+                        updatePagination();
                     });
-
-                    // 현재 페이지 번호만 파란색으로 표시
-                    pageLink.classList.add('current');
-                });
-                pagination.appendChild(pageLink);
-            }
-            
-            // 다음 버튼 생성
-            const nextButton = document.createElement('a');
-            nextButton.href = '#';
-            nextButton.textContent = '다음';
-            nextButton.addEventListener('click', () => {
-                if (currentPage < totalPages) {
-                    currentPage++;
-                    showPage(currentPage);
-                    updatePagination();
+                    pagination.appendChild(pageLink);
                 }
-            });
-            pagination.appendChild(nextButton);
+            }
+            updatePagination();
         };
 
 

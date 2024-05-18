@@ -151,7 +151,7 @@ def search_news(request):
             link_conditions = Q(link=saved_url[0])
             for link in saved_url[1:]:
                 link_conditions |= Q(link=link)
-            search_results = News.objects.filter(link_conditions).order_by('-create_date')
+            search_results = News.objects.filter(link_conditions).order_by('-news_date')
             context = {'news_list' : search_results}
         else:
             context = {'news_list' : []}
