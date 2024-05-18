@@ -33,6 +33,7 @@
             border: none;
             border-radius: 3px;
             margin-right: 10px;
+            width: 270px;
         }
         .search-form button {
             padding: 8px 16px;
@@ -41,6 +42,7 @@
             background-color: #A9A9F5;
             color: #fff;
             cursor: pointer;
+            margin-right: 0px;
         }
         .search-form button:hover {
             background-color: #D358F7;
@@ -111,7 +113,7 @@
     <div class="container">
        <!-- 검색 폼 -->
         <form class="search-form" id="search-news" method="GET" action="{% url 'search-news' %}" style="margin-right: 20px;">
-            <input type="text" name="kw" placeholder="검색어 입력" id="news-keyword-input" style="margin-right: 10px;">
+            <input type="text" name="kw" placeholder="검색어 입력" style="margin-right: 10px;">
             <div class="form-group" style="margin-right: 10px;">
                 <label for="startDate">시작 날짜:</label>
                 <input type="date" name='sDate' id="startDate" min="1960-01-01">
@@ -131,7 +133,6 @@
                             <span>{{ forloop.counter }} <a href="/pybo/{{ news.id }}/">{{ news.subject }}</a></span>
                             <span style="float: right;">{{ news.news_date}}</span>
                         </li>
-
                     {% endfor %}
                 {% else %}
                     <p id="no-news">뉴스가 없습니다.</p>
