@@ -8,11 +8,11 @@
 
 ## 🛠 사용 기술 및 환경
 
-- **언어**: Python 3.10
-- **프레임워크**: Django
-- **자연어 처리**: konlpy
-- **데이터베이스**: SQLite
-- **기타**: HTML, CSS
+- **언어**: <img src="https://img.shields.io/badge/Python-3.10-blue?style=flat-square&logo=python&logoColor=white"/>
+- **프레임워크** <img src="https://img.shields.io/badge/Django-092E20?style=flat-square&logo=django&logoColor=white"/>
+- **자연어 처리** <img src="https://img.shields.io/badge/Konlpy-FF6600?style=flat-square&logo=python&logoColor=white" alt="Konlpy"/>
+- **데이터베이스** <img src="https://img.shields.io/badge/Konlpy-FF6600?style=flat-square&logo=python&logoColor=white" alt="Konlpy"/>
+- **기타**   <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white"/> <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white"/>
 
 ---
 
