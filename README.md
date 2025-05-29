@@ -8,7 +8,7 @@
 
 ## 🛠 사용 기술 및 환경
 
-- **언어**: <img src="https://img.shields.io/badge/Python-3.10-blue?style=flat-square&logo=python&logoColor=white"/>
+- **언어** <img src="https://img.shields.io/badge/Python-3.10-blue?style=flat-square&logo=python&logoColor=white"/>
 - **프레임워크** <img src="https://img.shields.io/badge/Django-092E20?style=flat-square&logo=django&logoColor=white"/>
 - **자연어 처리** <img src="https://img.shields.io/badge/Konlpy-FF6600?style=flat-square&logo=python&logoColor=white" alt="Konlpy"/>
 - **데이터베이스** <img src="https://img.shields.io/badge/Konlpy-FF6600?style=flat-square&logo=python&logoColor=white" alt="Konlpy"/>
